@@ -30,7 +30,7 @@ def main_menu():
                 else:
                     print("Hủy thao tác thoát.")
             else:
-                print("Lựa chọn không hợp lệ. Vui lòng thử lại.")
+                print("Lựa chọn không hợp lệ. Vui lòng thử lại. Hãy nhập số từ 1 đến 5!")
         except Exception as e:
             print(f"Đã xảy ra lỗi: {e}. Vui lòng thử lại.")
 
