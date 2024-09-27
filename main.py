@@ -1,4 +1,5 @@
 import may_tinh
+import phieu_choi
 
 def main_menu():
     while True:
@@ -11,9 +12,9 @@ def main_menu():
         print("5. Thoát chương trình")
         print("+------------------+")
         
-        lua_chon = input("Nhập lựa chọn của bạn: ").strip()
-        
         try:
+            lua_chon = input("Nhập lựa chọn của bạn (từ 1 đến 5): ").strip()
+            
             if lua_chon == '1':
                 may_tinh.menu()
             elif lua_chon == '2':
@@ -21,7 +22,10 @@ def main_menu():
             elif lua_chon == '3':
                 print("Chức năng quản lý dịch vụ chưa được triển khai.")
             elif lua_chon == '4':
-                print("Chức năng quản lý phiếu chơi chưa được triển khai.")
+                try:
+                    phieu_choi.menu()
+                except Exception as e:
+                    print(f"Có lỗi: {e}. Hãy thử lại!")
             elif lua_chon == '5':
                 confirm = may_tinh.xac_nhan("Bạn có chắc chắn muốn thoát chương trình?")
                 if confirm:
