@@ -11,9 +11,9 @@ def main_menu():
         print("5. Thoát chương trình")
         print("+------------------+")
         
-        lua_chon = input("Nhập lựa chọn của bạn: ").strip()
-        
         try:
+            lua_chon = input("Nhập lựa chọn của bạn (từ 1 đến 5): ").strip()
+            
             if lua_chon == '1':
                 may_tinh.menu()
             elif lua_chon == '2':

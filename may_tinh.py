@@ -15,9 +15,9 @@ def menu():
         print("| 11. THOÁT CHƯƠNG TRÌNH")
         print("+--------------------+")
 
-        lua_chon = input("Nhập lựa chọn của bạn: ").strip()
-
         try:
+            lua_chon = input("Nhập lựa chọn của bạn (từ 1 đến 11): ").strip()
+
             if lua_chon == '1':
                 hien_thi_danh_sach()
             elif lua_chon == '2':
@@ -45,7 +45,7 @@ def menu():
                 else:
                     print("Hủy thao tác thoát.")
             else:
-                print("Lựa chọn không hợp lệ. Vui lòng thử lại.")
+                print("Lựa chọn không hợp lệ. Vui lòng thử lại. Hãy nhập số từ 1 đến 11!")
         except Exception as e:
             print(f"Đã xảy ra lỗi: {e}. Vui lòng thử lại.")
 
