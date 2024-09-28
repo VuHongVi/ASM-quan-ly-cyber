@@ -106,4 +106,7 @@ def xac_nhan( message):
             print(f"Đã xảy ra lỗi: {e}. Vui lòng thử lại.")
 
 if __name__ == "__main__":
-    menu()
+    # menu()
+
+
+    print(type(int(1.0)))

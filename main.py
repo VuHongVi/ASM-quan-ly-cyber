@@ -1,6 +1,7 @@
 import may_tinh
 import phieu_choi
 import khach_hang
+import dich_vu
 
 def main_menu():
     while True:
@@ -15,8 +16,9 @@ def main_menu():
         
         try:
             lua_chon = input("Nhập lựa chọn của bạn (từ 1 đến 5): ").strip()
+    
             if not lua_chon.isdigit() or not (1 <= int(lua_chon) <= 5):
-                raise ValueError("Lựa chọn không hợp lệ. Vui lòng nhập số nguyên từ 1 đến 5!")
+                raise ValueError("Lựa chọn không hợp lệ. Vui lòng nhập số nguyên từ 1 đến 5!\n(Không nhập theo dạng số thực có dấu phẩy động!)")
 
             lua_chon = int(lua_chon)
             if lua_chon == 1:
@@ -26,9 +28,11 @@ def main_menu():
                     khach_hang.menu()
                 except Exception as e:
                     print(f"Có lỗi: {e}. Hãy thử lại!")
-                print("Chức năng quản lý khách hàng chưa được triển khai.")
             elif lua_chon == 3:
-                print("Chức năng quản lý dịch vụ chưa được triển khai.")
+                try:
+                    dich_vu.menu()
+                except Exception as e:
+                    print(f"Có lỗi: {e}. Hãy thử lại!")
             elif lua_chon == 4:
                 try:
                     phieu_choi.menu()
