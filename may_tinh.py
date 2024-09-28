@@ -17,7 +17,7 @@ def menu():
 
         try:
             lua_chon = input("Nhập lựa chọn của bạn (từ 1 đến 11): ").strip()
-            if not lua_chon.isdigit() or not (1 <= int(lua_chon) <= 11) or int(lua_chon) != float(lua_chon):
+            if not lua_chon.isdigit() or not (1 <= int(lua_chon) <= 11):
                 raise ValueError("Lựa chọn không hợp lệ. Vui lòng nhập số nguyên từ 1 đến 11!\n(Không nhập theo dạng số thực có dấu phẩy động!)")
 
             lua_chon = int(lua_chon)
