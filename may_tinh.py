@@ -1,5 +1,8 @@
+from decimal import Decimal, InvalidOperation
+import os
 def menu():
     while True:
+        os.system('cls' if os.name == 'nt' else 'clear')
         print(">> QUẢN LÝ MÁY TÍNH <<")
         print("+--------------------+")
         print("| 1. Hiển thị danh sách máy tính")
@@ -17,10 +20,17 @@ def menu():
 
         try:
             lua_chon = input("Nhập lựa chọn của bạn (từ 1 đến 11): ").strip()
-            if not lua_chon.isdigit() or not (1 <= int(lua_chon) <= 11):
-                raise ValueError("Lựa chọn không hợp lệ. Vui lòng nhập số nguyên từ 1 đến 11!\n(Không nhập theo dạng số thực có dấu phẩy động!)")
+            
+            try:
+                lua_chon = Decimal(lua_chon)
+            except InvalidOperation:
+                raise ValueError("Lựa chọn không hợp lệ. Vui lòng nhập số từ 1 đến 11!")
+
+            if lua_chon % 1 != 0 or not (1 <= int(lua_chon) <= 11):
+                raise ValueError("Lựa chọn phải là số nguyên từ 1 đến 11.")
 
             lua_chon = int(lua_chon)
+            
             if lua_chon == 1:
                 hien_thi_danh_sach()
             elif lua_chon == 2:
@@ -47,10 +57,16 @@ def menu():
                     break
                 else:
                     print("Hủy thao tác thoát.")
+            press_any_key_to_continue()  # Đợi người dùng nhấn phím để tiếp tục
         except ValueError as v:
             print(v)
+            press_any_key_to_continue()  # Đợi người dùng nhấn phím trước khi quay lại menu
         except Exception as e:
             print(f"Đã xảy ra lỗi: {e}. Vui lòng thử lại.")
+            press_any_key_to_continue()  # Đợi người dùng nhấn phím trước khi quay lại menu
+
+def press_any_key_to_continue():
+    input("\nNhấn phím bất kỳ để tiếp tục...")
 
 def hien_thi_danh_sach():
     chuc_nang = "hiển thị danh sách máy tính"
