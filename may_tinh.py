@@ -1,5 +1,39 @@
 from decimal import Decimal, InvalidOperation
 import os
+import json
+import validate
+
+# Lớp Máy Tính đại diện cho máy tính trong quán game
+class MayTinh:
+    def __init__(self, ma, tinh_trang, vi_tri, gia, cau_hinh):
+        self.ma = ma
+        self.tinh_trang = tinh_trang
+        self.vi_tri = vi_tri
+        self.gia = Decimal(gia)
+        self.cau_hinh = cau_hinh
+
+    def __str__(self):
+        return f"Mã: {self.ma}, Tình trạng: {self.tinh_trang}, Vị trí: {self.vi_tri}, Giá: {self.gia}, Cấu hình: {self.cau_hinh}"
+
+    def to_dict(self):
+        return {
+            "ma": self.ma,
+            "tinh_trang": self.tinh_trang,
+            "vi_tri": self.vi_tri,
+            "gia": str(self.gia),
+            "cau_hinh": self.cau_hinh
+        }
+
+    @staticmethod
+    def from_dict(data):
+        return MayTinh(data['ma'], data['tinh_trang'], data['vi_tri'], data['gia'], data['cau_hinh'])
+
+# Danh sách máy tính
+danh_sach_may_tinh = []
+
+# Đường dẫn file dữ liệu
+DATA_FILE = "D:\FPT Polytechnic\DAT2011 - LẬP TRÌNH PYTHON\code\ASM-quan-ly-cyber/may_tinh.json"
+
 def menu():
     while True:
         os.system('cls' if os.name == 'nt' else 'clear')
@@ -30,7 +64,7 @@ def menu():
                 raise ValueError("Lựa chọn phải là số nguyên từ 1 đến 11.")
 
             lua_chon = int(lua_chon)
-            
+
             if lua_chon == 1:
                 hien_thi_danh_sach()
             elif lua_chon == 2:
@@ -52,79 +86,151 @@ def menu():
             elif lua_chon == 10:
                 tinh_tong_gia_tri()
             elif lua_chon == 11:
-                if xac_nhan("Bạn có chắc chắn muốn thoát chương trình?"):
+                if validate.xac_nhan("Bạn có chắc chắn muốn thoát chương trình?"):
                     print("Đã thoát chương trình...")
                     break
                 else:
                     print("Hủy thao tác thoát.")
-            press_any_key_to_continue()  # Đợi người dùng nhấn phím để tiếp tục
+            press_any_key_to_continue()
         except ValueError as v:
             print(v)
-            press_any_key_to_continue()  # Đợi người dùng nhấn phím trước khi quay lại menu
+            press_any_key_to_continue()
         except Exception as e:
             print(f"Đã xảy ra lỗi: {e}. Vui lòng thử lại.")
-            press_any_key_to_continue()  # Đợi người dùng nhấn phím trước khi quay lại menu
+            press_any_key_to_continue()
 
 def press_any_key_to_continue():
     input("\nNhấn phím bất kỳ để tiếp tục...")
 
+# Lưu danh sách máy tính vào file
+def luu_vao_file():
+    try:
+        with open(DATA_FILE, 'w') as file:
+            json.dump([may.to_dict() for may in danh_sach_may_tinh], file)
+        print("Lưu dữ liệu vào file thành công.")
+    except Exception as e:
+        print(f"Lỗi khi lưu dữ liệu: {e}")
+
+# Đọc thông tin máy tính từ file
+def doc_tu_file():
+    global danh_sach_may_tinh
+    # Kiểm tra nếu file chưa tồn tại, tạo file mới
+    if not os.path.exists(DATA_FILE):
+        try:
+            with open(DATA_FILE, 'w') as file:
+                json.dump([], file)  # Tạo một danh sách rỗng trong file
+            print(f"File dữ liệu mới đã được tạo: {DATA_FILE}")
+        except Exception as e:
+            print(f"Lỗi khi tạo file dữ liệu mới: {e}")
+            return  # Thoát hàm nếu gặp lỗi khi tạo file
+    try:
+        with open(DATA_FILE, 'r') as file:
+            data = json.load(file)
+            danh_sach_may_tinh = [MayTinh.from_dict(may) for may in data]
+        print("Đọc dữ liệu từ file thành công.")
+    except json.JSONDecodeError:
+        print("File dữ liệu không đúng định dạng.")
+    except Exception as e:
+        print(f"Lỗi khi đọc dữ liệu: {e}")
+
+
 def hien_thi_danh_sach():
-    chuc_nang = "hiển thị danh sách máy tính"
-    print(f'Chức năng {chuc_nang} sẽ sớm được cập nhật!')
+    doc_tu_file()  # Đọc dữ liệu từ file trước khi hiển thị
+    if danh_sach_may_tinh:
+        print("\nDanh sách máy tính:")
+        for may in danh_sach_may_tinh:
+            print(may)
+    else:
+        print("Hiện không có máy tính nào trong danh sách.")
 
 def tim_kiem():
-    chuc_nang = "tìm kiếm/Lọc máy tính"
-    print(f'Chức năng {chuc_nang} sẽ sớm được cập nhật!')
+    doc_tu_file()  # Đọc dữ liệu từ file
+    ma = input("Nhập mã máy tính cần tìm: ").strip()
+    ket_qua = [may for may in danh_sach_may_tinh if may.ma == ma]
+    if ket_qua:
+        print("\nKết quả tìm kiếm:")
+        for may in ket_qua:
+            print(may)
+    else:
+        print("Không tìm thấy máy tính với mã đã nhập.")
 
 def them_moi():
-    if xac_nhan("Bạn có chắc chắn muốn thêm mới máy tính không?"):
-        chuc_nang = "thêm mới máy tính"
-        print(f'Chức năng {chuc_nang} sẽ sớm được cập nhật!')
+    doc_tu_file()  # Đọc dữ liệu từ file
+    if validate.xac_nhan("Bạn có chắc chắn muốn thêm mới máy tính không?"):
+        ma = input("Nhập mã máy tính: ").strip()
+        tinh_trang = input("Nhập tình trạng máy tính: ").strip()
+        vi_tri = input("Nhập vị trí máy tính: ").strip()
+        gia = input("Nhập giá máy tính: ").strip()
+        cau_hinh = input("Nhập cấu hình máy tính: ").strip()
+        try:
+            may_tinh = MayTinh(ma, tinh_trang, vi_tri, gia, cau_hinh)
+            danh_sach_may_tinh.append(may_tinh)
+            luu_vao_file()  # Lưu dữ liệu vào file sau khi thêm mới
+            print("Thêm máy tính mới thành công!")
+        except Exception as e:
+            print(f"Lỗi khi thêm máy tính: {e}")
 
 def cap_nhat():
-    if xac_nhan("Bạn có chắc chắn muốn cập nhật thông tin cho máy?"):
-        chuc_nang = "cập nhật thông tin máy tính"
-        print(f'Chức năng {chuc_nang} sẽ sớm được cập nhật!')
+    doc_tu_file()  # Đọc dữ liệu từ file
+    if validate.xac_nhan("Bạn có chắc chắn muốn cập nhật máy tính không?"):
+        ma = input("Nhập mã máy tính cần cập nhật: ").strip()
+        for may in danh_sach_may_tinh:
+            if may.ma == ma:
+                tinh_trang = input(f"Cập nhật tình trạng ({may.tinh_trang}): ").strip() or may.tinh_trang
+                vi_tri = input(f"Cập nhật vị trí ({may.vi_tri}): ").strip() or may.vi_tri
+                gia = input(f"Cập nhật giá ({may.gia}): ").strip() or may.gia
+                cau_hinh = input(f"Cập nhật cấu hình ({may.cau_hinh}): ").strip() or may.cau_hinh
+                may.tinh_trang, may.vi_tri, may.gia, may.cau_hinh = tinh_trang, vi_tri, Decimal(gia), cau_hinh
+                luu_vao_file()  # Lưu dữ liệu vào file sau khi cập nhật
+                print("Cập nhật thông tin máy tính thành công!")
+                return
+        print("Không tìm thấy máy tính với mã đã nhập.")
 
 def xoa():
-    if xac_nhan("Bạn có chắc chắn muốn xóa máy?"):
-        chuc_nang = "xóa máy tính"
-        print(f'Chức năng {chuc_nang} sẽ sớm được cập nhật!')
+    doc_tu_file()  # Đọc dữ liệu từ file
+    if validate.xac_nhan("Bạn có chắc chắn muốn thêm mới máy tính không?"):
+        ma = input("Nhập mã máy tính cần xóa: ").strip()
+        global danh_sach_may_tinh
+        danh_sach_may_tinh = [may for may in danh_sach_may_tinh if may.ma != ma]
+        luu_vao_file()  # Lưu dữ liệu vào file sau khi xóa
+        print("Xóa máy tính thành công!" if danh_sach_may_tinh else "Không tìm thấy máy tính với mã đã nhập.")
 
 def sap_xep_theo_gia():
-    chuc_nang = "sắp xếp máy tính theo giá"
-    print(f'Chức năng {chuc_nang} sẽ sớm được cập nhật!')
+    doc_tu_file()  # Đọc dữ liệu từ file
+    danh_sach_may_tinh.sort(key=lambda x: x.gia)
+    print("Danh sách máy tính đã được sắp xếp theo giá.")
+    for may in danh_sach_may_tinh:
+        print(may)
 
 def sap_xep_theo_tinh_trang():
-    chuc_nang = "sắp xếp máy tính theo tình trạng"
-    print(f'Chức năng {chuc_nang} sẽ sớm được cập nhật!')
-
-def hien_thi_may_trong():
-    chuc_nang = "hiển thị máy trống"
-    print(f'Chức năng {chuc_nang} sẽ sớm được cập nhật!')
-
-def tinh_tong_gia_tri():
-    chuc_nang = "tính tổng giá trị tất cả máy tính"
-    print(f'Chức năng {chuc_nang} sẽ sớm được cập nhật!')
+    doc_tu_file()  # Đọc dữ liệu từ file
+    danh_sach_may_tinh.sort(key=lambda x: x.tinh_trang)
+    print("Danh sách máy tính đã được sắp xếp theo tình trạng.")
+    for may in danh_sach_may_tinh:
+        print(may)
 
 def sap_xep_theo_cau_hinh():
-    chuc_nang = "sắp xếp máy tính theo cấu hình"
-    print(f'Chức năng {chuc_nang} sẽ sớm được cập nhật!')
+    doc_tu_file()  # Đọc dữ liệu từ file
+    danh_sach_may_tinh.sort(key=lambda x: x.cau_hinh)
+    print("Danh sách máy tính đã được sắp xếp theo cấu hình.")
+    for may in danh_sach_may_tinh:
+        print(may)
 
-def xac_nhan(message):
-    while True:
-        try:
-            xac_nhan = input(f"{message} (Y/N): ").strip().lower()
-            if xac_nhan == 'y':
-                return True
-            elif xac_nhan == 'n':
-                return False
-            else:
-                raise ValueError("Lựa chọn không hợp lệ. Vui lòng nhập Y hoặc N.")
-        except ValueError as ve:
-            print(ve)
-        except Exception as e:
-            print(f"Đã xảy ra lỗi: {e}. Vui lòng thử lại.")
+def hien_thi_may_trong():
+    doc_tu_file()  # Đọc dữ liệu từ file
+    may_trong = [may for may in danh_sach_may_tinh if may.tinh_trang.lower() == 'trong']
+    if may_trong:
+        print("\nCác máy còn trống:")
+        for may in may_trong:
+            print(may)
+    else:
+        print("Không có máy nào đang trống.")
+
+def tinh_tong_gia_tri():
+    doc_tu_file()  # Đọc dữ liệu từ file
+    tong_gia_tri = sum(may.gia for may in danh_sach_may_tinh)
+    print(f"Tổng giá trị tất cả máy tính: {tong_gia_tri}")
+
 
 if __name__ == "__main__":
     menu()
