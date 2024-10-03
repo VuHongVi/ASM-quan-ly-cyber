@@ -157,12 +157,48 @@ def tim_kiem():
 def them_moi():
     doc_tu_file()  # Đọc dữ liệu từ file
     if validate.xac_nhan("Bạn có chắc chắn muốn thêm mới máy tính không?"):
-        ma = input("Nhập mã máy tính: ").strip()
-        tinh_trang = input("Nhập tình trạng máy tính: ").strip()
-        vi_tri = input("Nhập vị trí máy tính: ").strip()
-        gia = input("Nhập giá máy tính: ").strip()
-        cau_hinh = input("Nhập cấu hình máy tính: ").strip()
         try:
+            # Nhập mã máy tính với vòng lặp
+            while True:
+                try:
+                    ma = validate.validate_ma(input("Nhập mã máy tính (mamayxxx): ").strip(), danh_sach_may_tinh)
+                    break  # Thoát vòng lặp nếu mã hợp lệ
+                except ValueError as e:
+                    print(f"Lỗi: {e}. Vui lòng nhập lại.")
+
+            # Nhập tình trạng với vòng lặp
+            while True:
+                try:
+                    tinh_trang = validate.validate_tinh_trang(input("Nhập tình trạng máy tính (trong/dang_su_dung/bao_tri): ").strip())
+                    break  # Thoát vòng lặp nếu tình trạng hợp lệ
+                except ValueError as e:
+                    print(f"Lỗi: {e}. Vui lòng nhập lại.")
+
+            # Nhập vị trí với vòng lặp
+            while True:
+                try:
+                    vi_tri = validate.validate_vi_tri(input("Nhập vị trí máy tính (Xxx, ví dụ A01): ").strip())
+                    break  # Thoát vòng lặp nếu vị trí hợp lệ
+                except ValueError as e:
+                    print(f"Lỗi: {e}. Vui lòng nhập lại.")
+
+            # Nhập giá với vòng lặp
+            while True:
+                try:
+                    gia = validate.validate_gia(input("Nhập giá máy tính: ").strip())
+                    break  # Thoát vòng lặp nếu giá hợp lệ
+                except ValueError as e:
+                    print(f"Lỗi: {e}. Vui lòng nhập lại.")
+
+            # Nhập cấu hình với vòng lặp
+            while True:
+                try:
+                    cau_hinh = validate.validate_cau_hinh(input("Nhập cấu hình máy tính: ").strip())
+                    break  # Thoát vòng lặp nếu cấu hình hợp lệ
+                except ValueError as e:
+                    print(f"Lỗi: {e}. Vui lòng nhập lại.")
+
+            # Tạo đối tượng máy tính và thêm vào danh sách
             may_tinh = MayTinh(ma, tinh_trang, vi_tri, gia, cau_hinh)
             danh_sach_may_tinh.append(may_tinh)
             luu_vao_file()  # Lưu dữ liệu vào file sau khi thêm mới
@@ -170,17 +206,55 @@ def them_moi():
         except Exception as e:
             print(f"Lỗi khi thêm máy tính: {e}")
 
+
 def cap_nhat():
     doc_tu_file()  # Đọc dữ liệu từ file
     if validate.xac_nhan("Bạn có chắc chắn muốn cập nhật máy tính không?"):
         ma = input("Nhập mã máy tính cần cập nhật: ").strip()
         for may in danh_sach_may_tinh:
             if may.ma == ma:
-                tinh_trang = input(f"Cập nhật tình trạng ({may.tinh_trang}): ").strip() or may.tinh_trang
-                vi_tri = input(f"Cập nhật vị trí ({may.vi_tri}): ").strip() or may.vi_tri
-                gia = input(f"Cập nhật giá ({may.gia}): ").strip() or may.gia
-                cau_hinh = input(f"Cập nhật cấu hình ({may.cau_hinh}): ").strip() or may.cau_hinh
-                may.tinh_trang, may.vi_tri, may.gia, may.cau_hinh = tinh_trang, vi_tri, Decimal(gia), cau_hinh
+                # Cập nhật tình trạng với vòng lặp
+                while True:
+                    try:
+                        tinh_trang = input(f"Cập nhật tình trạng ({may.tinh_trang}) (trong/dang_su_dung/bao_tri): ").strip() or may.tinh_trang
+                        tinh_trang = validate.validate_tinh_trang(tinh_trang)
+                        break  # Thoát vòng lặp nếu tình trạng hợp lệ
+                    except ValueError as e:
+                        print(f"Lỗi: {e}. Vui lòng nhập lại.")
+
+                # Cập nhật vị trí với vòng lặp
+                while True:
+                    try:
+                        vi_tri = input(f"Cập nhật vị trí ({may.vi_tri}) (Xxx, ví dụ A01): ").strip() or may.vi_tri
+                        vi_tri = validate.validate_vi_tri(vi_tri)
+                        break  # Thoát vòng lặp nếu vị trí hợp lệ
+                    except ValueError as e:
+                        print(f"Lỗi: {e}. Vui lòng nhập lại.")
+
+                # Cập nhật giá với vòng lặp
+                while True:
+                    try:
+                        gia = input(f"Cập nhật giá ({may.gia}): ").strip() or may.gia
+                        gia = validate.validate_gia(gia)
+                        break  # Thoát vòng lặp nếu giá hợp lệ
+                    except ValueError as e:
+                        print(f"Lỗi: {e}. Vui lòng nhập lại.")
+
+                # Cập nhật cấu hình với vòng lặp
+                while True:
+                    try:
+                        cau_hinh = input(f"Cập nhật cấu hình ({may.cau_hinh}): ").strip() or may.cau_hinh
+                        cau_hinh = validate.validate_cau_hinh(cau_hinh)
+                        break  # Thoát vòng lặp nếu cấu hình hợp lệ
+                    except ValueError as e:
+                        print(f"Lỗi: {e}. Vui lòng nhập lại.")
+
+                # Cập nhật thông tin máy tính sau khi đã xác thực
+                may.tinh_trang = tinh_trang
+                may.vi_tri = vi_tri
+                may.gia = gia
+                may.cau_hinh = cau_hinh
+
                 luu_vao_file()  # Lưu dữ liệu vào file sau khi cập nhật
                 print("Cập nhật thông tin máy tính thành công!")
                 return
@@ -188,12 +262,24 @@ def cap_nhat():
 
 def xoa():
     doc_tu_file()  # Đọc dữ liệu từ file
-    if validate.xac_nhan("Bạn có chắc chắn muốn thêm mới máy tính không?"):
-        ma = input("Nhập mã máy tính cần xóa: ").strip()
-        global danh_sach_may_tinh
-        danh_sach_may_tinh = [may for may in danh_sach_may_tinh if may.ma != ma]
-        luu_vao_file()  # Lưu dữ liệu vào file sau khi xóa
-        print("Xóa máy tính thành công!" if danh_sach_may_tinh else "Không tìm thấy máy tính với mã đã nhập.")
+    if validate.xac_nhan("Bạn có chắc chắn muốn xóa máy tính không?"):
+        while True:
+            try:
+                # Nhập mã máy tính cần xóa
+                ma = input("Nhập mã máy tính cần xóa: ").strip()
+                
+                # Kiểm tra mã có tồn tại trong danh sách không
+                if any(may.ma == ma for may in danh_sach_may_tinh):
+                    # Xác nhận xóa máy tính
+                    global danh_sach_may_tinh
+                    danh_sach_may_tinh = [may for may in danh_sach_may_tinh if may.ma != ma]
+                    luu_vao_file()  # Lưu dữ liệu vào file sau khi xóa
+                    print("Xóa máy tính thành công!")
+                    break  # Thoát khỏi vòng lặp sau khi xóa thành công
+                else:
+                    print("Không tìm thấy máy tính với mã đã nhập. Vui lòng thử lại.")
+            except Exception as e:
+                print(f"Lỗi khi xóa máy tính: {e}")
 
 def sap_xep_theo_gia():
     doc_tu_file()  # Đọc dữ liệu từ file
