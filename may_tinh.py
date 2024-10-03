@@ -262,7 +262,8 @@ def cap_nhat():
 
 def xoa():
     doc_tu_file()  # Đọc dữ liệu từ file
-    if validate.xac_nhan("Bạn có chắc chắn muốn xóa máy tính không?"):
+    if validate.validate_confirm_input("Bạn có chắc chắn muốn xóa máy tính không?"):
+        global danh_sach_may_tinh  # Khai báo biến toàn cục trước khi sử dụng
         while True:
             try:
                 # Nhập mã máy tính cần xóa
@@ -271,7 +272,6 @@ def xoa():
                 # Kiểm tra mã có tồn tại trong danh sách không
                 if any(may.ma == ma for may in danh_sach_may_tinh):
                     # Xác nhận xóa máy tính
-                    global danh_sach_may_tinh
                     danh_sach_may_tinh = [may for may in danh_sach_may_tinh if may.ma != ma]
                     luu_vao_file()  # Lưu dữ liệu vào file sau khi xóa
                     print("Xóa máy tính thành công!")
