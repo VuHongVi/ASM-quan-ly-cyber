@@ -198,11 +198,23 @@ def them_moi():
                 except ValueError as e:
                     print(f"Lỗi: {e}. Vui lòng nhập lại.")
 
-            # Tạo đối tượng máy tính và thêm vào danh sách
-            may_tinh = MayTinh(ma, tinh_trang, vi_tri, gia, cau_hinh)
-            danh_sach_may_tinh.append(may_tinh)
-            luu_vao_file()  # Lưu dữ liệu vào file sau khi thêm mới
-            print("Thêm máy tính mới thành công!")
+            # Hiển thị thông tin đã nhập để xác nhận lại
+            print("\nThông tin máy tính bạn đã nhập:")
+            print(f"Mã máy tính: {ma}")
+            print(f"Tình trạng: {tinh_trang}")
+            print(f"Vị trí: {vi_tri}")
+            print(f"Giá: {gia}")
+            print(f"Cấu hình: {cau_hinh}")
+
+            # Xác nhận lần cuối trước khi lưu vào danh sách và file
+            if validate.validate_confirm_input("Bạn có chắc chắn muốn lưu thông tin này không?"):
+                # Tạo đối tượng máy tính và thêm vào danh sách
+                may_tinh = MayTinh(ma, tinh_trang, vi_tri, gia, cau_hinh)
+                danh_sach_may_tinh.append(may_tinh)
+                luu_vao_file()  # Lưu dữ liệu vào file sau khi thêm mới
+                print("Thêm máy tính mới thành công!")
+            else:
+                print("Hủy thao tác thêm mới máy tính.")
         except Exception as e:
             print(f"Lỗi khi thêm máy tính: {e}")
 
