@@ -207,7 +207,7 @@ def them_moi():
             print(f"Cấu hình: {cau_hinh}")
 
             # Xác nhận lần cuối trước khi lưu vào danh sách và file
-            if validate.validate_confirm_input("Bạn có chắc chắn muốn lưu thông tin này không?"):
+            if validate.xac_nhan("Bạn có chắc chắn muốn lưu thông tin này không?"):
                 # Tạo đối tượng máy tính và thêm vào danh sách
                 may_tinh = MayTinh(ma, tinh_trang, vi_tri, gia, cau_hinh)
                 danh_sach_may_tinh.append(may_tinh)
@@ -261,20 +261,32 @@ def cap_nhat():
                     except ValueError as e:
                         print(f"Lỗi: {e}. Vui lòng nhập lại.")
 
-                # Cập nhật thông tin máy tính sau khi đã xác thực
-                may.tinh_trang = tinh_trang
-                may.vi_tri = vi_tri
-                may.gia = gia
-                may.cau_hinh = cau_hinh
+                # Hiển thị thông tin đã cập nhật để xác nhận lại
+                print("\nThông tin máy tính sau khi cập nhật:")
+                print(f"Mã máy tính: {ma}")
+                print(f"Tình trạng: {tinh_trang}")
+                print(f"Vị trí: {vi_tri}")
+                print(f"Giá: {gia}")
+                print(f"Cấu hình: {cau_hinh}")
 
-                luu_vao_file()  # Lưu dữ liệu vào file sau khi cập nhật
-                print("Cập nhật thông tin máy tính thành công!")
+                # Xác nhận lần cuối trước khi lưu vào danh sách và file
+                if validate.xac_nhan("Bạn có chắc chắn muốn lưu thay đổi này không?"):
+                    # Cập nhật thông tin máy tính sau khi xác nhận
+                    may.tinh_trang = tinh_trang
+                    may.vi_tri = vi_tri
+                    may.gia = gia
+                    may.cau_hinh = cau_hinh
+
+                    luu_vao_file()  # Lưu dữ liệu vào file sau khi cập nhật
+                    print("Cập nhật thông tin máy tính thành công!")
+                else:
+                    print("Hủy thao tác cập nhật.")
                 return
         print("Không tìm thấy máy tính với mã đã nhập.")
 
 def xoa():
     doc_tu_file()  # Đọc dữ liệu từ file
-    if validate.validate_confirm_input("Bạn có chắc chắn muốn xóa máy tính không?"):
+    if validate.xac_nhan("Bạn có chắc chắn muốn xóa máy tính không?"):
         global danh_sach_may_tinh  # Khai báo biến toàn cục trước khi sử dụng
         while True:
             try:
@@ -282,12 +294,25 @@ def xoa():
                 ma = input("Nhập mã máy tính cần xóa: ").strip()
                 
                 # Kiểm tra mã có tồn tại trong danh sách không
-                if any(may.ma == ma for may in danh_sach_may_tinh):
+                may_can_xoa = next((may for may in danh_sach_may_tinh if may.ma == ma), None)
+                if may_can_xoa:
+                    # Hiển thị thông tin máy tính cần xóa
+                    print("\nThông tin máy tính sẽ bị xóa:")
+                    print(f"Mã máy tính: {may_can_xoa.ma}")
+                    print(f"Tình trạng: {may_can_xoa.tinh_trang}")
+                    print(f"Vị trí: {may_can_xoa.vi_tri}")
+                    print(f"Giá: {may_can_xoa.gia}")
+                    print(f"Cấu hình: {may_can_xoa.cau_hinh}")
+
                     # Xác nhận xóa máy tính
-                    danh_sach_may_tinh = [may for may in danh_sach_may_tinh if may.ma != ma]
-                    luu_vao_file()  # Lưu dữ liệu vào file sau khi xóa
-                    print("Xóa máy tính thành công!")
-                    break  # Thoát khỏi vòng lặp sau khi xóa thành công
+                    if validate.xac_nhan("Bạn có chắc chắn muốn xóa máy tính này không?"):
+                        danh_sach_may_tinh = [may for may in danh_sach_may_tinh if may.ma != ma]
+                        luu_vao_file()  # Lưu dữ liệu vào file sau khi xóa
+                        print("Xóa máy tính thành công!")
+                        break  # Thoát khỏi vòng lặp sau khi xóa thành công
+                    else:
+                        print("Hủy thao tác xóa.")
+                        break  # Thoát khỏi vòng lặp nếu người dùng không muốn xóa
                 else:
                     print("Không tìm thấy máy tính với mã đã nhập. Vui lòng thử lại.")
             except Exception as e:
