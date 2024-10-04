@@ -32,7 +32,7 @@ class MayTinh:
 danh_sach_may_tinh = []
 
 # Đường dẫn file dữ liệu
-DATA_FILE = "D:\FPT Polytechnic\DAT2011 - LẬP TRÌNH PYTHON\code\ASM-quan-ly-cyber/may_tinh.json"
+DATA_FILE = r"D:\FPT Polytechnic\DAT2011 - LẬP TRÌNH PYTHON\code\ASM-quan-ly-cyber\may_tinh.json"
 
 def menu():
     while True:
