@@ -4,23 +4,15 @@ import re
 def validate_ma(ma, danh_sach_may_tinh):
     """Kiểm tra mã máy tính: không được rỗng, có định dạng hợp lệ và duy nhất."""
     ma = ma.strip()
-    # Kiểm tra độ dài mã máy tính
     if not ma:
         raise ValueError("Mã máy tính không được để trống.")
-    
-    # Kiểm tra định dạng mã máy tính
     if not re.match(r"^mamay\d{3}$", ma):
         raise ValueError("Mã máy tính phải có định dạng 'mamayxxx' với xxx là các số từ 001 đến 999.")
-    
-    # Kiểm tra giá trị số của xxx
     number_part = int(ma[-3:])
     if not (1 <= number_part <= 999):
         raise ValueError("Phần số của mã máy tính phải nằm trong khoảng từ 001 đến 999.")
-
-    # Kiểm tra mã máy tính có trùng lặp không
     if any(may.ma == ma for may in danh_sach_may_tinh):
         raise ValueError("Mã máy tính đã tồn tại. Vui lòng nhập mã khác.")
-    
     return ma
 
 def validate_tinh_trang(tinh_trang):
@@ -34,7 +26,6 @@ def validate_tinh_trang(tinh_trang):
 def validate_vi_tri(vi_tri):
     """Kiểm tra vị trí: phải có định dạng hợp lệ."""
     vi_tri = vi_tri.strip()
-    # Kiểm tra nếu vị trí tuân theo định dạng chữ + số (ví dụ: A01, B02)
     if not re.match(r"^[A-Za-z]\d{2}$", vi_tri):
         raise ValueError("Vị trí phải có định dạng 'Xxx', với 'X' là một chữ cái và 'xx' là hai chữ số.")
     return vi_tri
@@ -45,7 +36,6 @@ def validate_gia(gia):
         gia_value = Decimal(gia)
         if gia_value <= 0:
             raise ValueError("Giá máy tính phải lớn hơn 0.")
-        # Giả sử giá máy tính không được vượt quá 1 tỷ
         if gia_value > 1_000_000_000:
             raise ValueError("Giá máy tính không được vượt quá 1 tỷ.")
     except InvalidOperation:
@@ -58,24 +48,7 @@ def validate_cau_hinh(cau_hinh):
         raise ValueError("Cấu hình máy tính không được để trống.")
     return cau_hinh.strip()
 
-
 def xac_nhan(message):
-    while True:
-        try:
-            xac_nhan = input(f"{message} (Y/N): ").strip().lower()
-            if xac_nhan == 'y':
-                return True
-            elif xac_nhan == 'n':
-                return False
-            else:
-                raise ValueError("Lựa chọn không hợp lệ. Vui lòng nhập Y hoặc N.")
-        except ValueError as ve:
-            print(ve)
-        except Exception as e:
-            print(f"Đã xảy ra lỗi: {e}. Vui lòng thử lại.")
-
-def validate_confirm_input(message):
-    """Kiểm tra xác nhận Y/N từ người dùng."""
     while True:
         try:
             xac_nhan = input(f"{message} (Y/N): ").strip().lower()
