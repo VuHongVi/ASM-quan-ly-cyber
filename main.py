@@ -2,6 +2,7 @@
 
 import sys
 import os
+from decimal import Decimal, InvalidOperation
 # Import các module từ package
 from quan_ly_may_tinh import menu as may_tinh_menu
 from quan_ly_may_tinh import validate
@@ -26,10 +27,13 @@ def main_menu():
         
         try:
             lua_chon = input("Nhập lựa chọn của bạn (từ 1 đến 5): ").strip()
-            lua_chon = int(lua_chon)
+            try:
+                lua_chon = Decimal(lua_chon)
+            except InvalidOperation:
+                raise ValueError("Lựa chọn không hợp lệ. Vui lòng nhập số từ 1 đến 11!")
 
-            if not (1 <= lua_chon <= 5):
-                raise ValueError("Lựa chọn phải là số nguyên từ 1 đến 5.")
+            if lua_chon % 1 != 0 or not (1 <= int(lua_chon) <= 11):
+                raise ValueError("Lựa chọn phải là số nguyên từ 1 đến 11.")
 
             if lua_chon == 1:
                 may_tinh_menu()

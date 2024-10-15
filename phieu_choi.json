@@ -1,0 +1,26 @@
+[
+  {
+    "ma_phieu": 3,
+    "khach_hang": "Tran Thi B",
+    "may_tinh": 3,
+    "gio_bat_dau": "2024-10-13 13:30",
+    "gio_ket_thuc": "2024-10-13 15:00",
+    "dich_vu": "Dang ki thanh vien"
+  },
+  {
+    "ma_phieu": 4,
+    "khach_hang": "linh",
+    "may_tinh": 5,
+    "gio_bat_dau": "2024-04-08 13:00",
+    "gio_ket_thuc": "2024-04-9 14:00",
+    "dich_vu": "choi game"
+  },
+  {
+    "ma_phieu": 1,
+    "khach_hang": "Vi",
+    "may_tinh": 5,
+    "gio_bat_dau": "2024-10-15 11:29",
+    "gio_ket_thuc": "2024-10-15 11:45",
+    "dich_vu": "sting"
+  }
+]

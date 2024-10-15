@@ -1,6 +1,7 @@
 from decimal import Decimal, InvalidOperation
 import os
 import json
+# import validate
 from . import validate
 
 # Lớp Máy Tính đại diện cho máy tính trong quán game
@@ -45,7 +46,7 @@ class QuanLyMayTinh:
             print(f"Lỗi khi lưu dữ liệu: {e}")
 
     # Đọc thông tin máy tính từ file
-    def doc_tu_file(self):
+    def doc_tu_file(self):  
         # Kiểm tra nếu file chưa tồn tại, tạo file mới
         if not os.path.exists(self.data_file):
             try:
@@ -112,7 +113,8 @@ class QuanLyMayTinh:
                 while True:
                     try:
                         vi_tri = validate.validate_vi_tri(
-                            input("Nhập vị trí máy tính (Xxx, ví dụ A01): ").strip()
+                            input("Nhập vị trí máy tính (Xxxx, ví dụ A001): ").strip(),
+                            self.danh_sach_may_tinh
                         )
                         break
                     except ValueError as e:
@@ -166,19 +168,19 @@ class QuanLyMayTinh:
                     # Cập nhật thông tin
                     try:
                         # Cập nhật tình trạng
-                        tinh_trang = input(f"Cập nhật tình trạng ({may.tinh_trang}) (trong/dang_su_dung/bao_tri): ").strip() or may.tinh_trang
+                        tinh_trang = input(f"Cập nhật tình trạng ({may.tinh_trang}) (trong/dang_su_dung/bao_tri). Nhấn Enter nếu không muốn thay đổi: ").strip() or may.tinh_trang
                         tinh_trang = validate.validate_tinh_trang(tinh_trang)
 
                         # Cập nhật vị trí
-                        vi_tri = input(f"Cập nhật vị trí ({may.vi_tri}) (Xxx, ví dụ A01): ").strip() or may.vi_tri
-                        vi_tri = validate.validate_vi_tri(vi_tri)
+                        vi_tri = input(f"Cập nhật vị trí ({may.vi_tri}) (Xxxx, ví dụ A001). Nhấn Enter nếu không muốn thay đổi: ").strip() or may.vi_tri
+                        vi_tri = validate.validate_vi_tri(vi_tri, self.danh_sach_may_tinh, ma_may_hien_tai=ma)
 
                         # Cập nhật giá
-                        gia = input(f"Cập nhật giá ({may.gia}): ").strip() or may.gia
+                        gia = input(f"Cập nhật giá ({may.gia}). Nhấn Enter nếu không muốn thay đổi: ").strip() or may.gia
                         gia = validate.validate_gia(gia)
 
                         # Cập nhật cấu hình
-                        cau_hinh = input(f"Cập nhật cấu hình ({may.cau_hinh}): ").strip() or may.cau_hinh
+                        cau_hinh = input(f"Cập nhật cấu hình ({may.cau_hinh}). Nhấn Enter nếu không muốn thay đổi: ").strip() or may.cau_hinh
                         cau_hinh = validate.validate_cau_hinh(cau_hinh)
                     except ValueError as e:
                         print(f"Lỗi: {e}")
@@ -287,11 +289,11 @@ def menu():
         try:
             lua_chon = input("Nhập lựa chọn của bạn (từ 1 đến 11): ").strip()
             try:
-                lua_chon = int(lua_chon)
-            except ValueError:
+                lua_chon = Decimal(lua_chon)
+            except InvalidOperation:
                 raise ValueError("Lựa chọn không hợp lệ. Vui lòng nhập số từ 1 đến 11!")
 
-            if not (1 <= lua_chon <= 11):
+            if lua_chon % 1 != 0 or not (1 <= int(lua_chon) <= 11):
                 raise ValueError("Lựa chọn phải là số nguyên từ 1 đến 11.")
 
             if lua_chon == 1:

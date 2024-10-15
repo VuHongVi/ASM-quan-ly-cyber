@@ -2,7 +2,7 @@ from decimal import Decimal, InvalidOperation
 import re
 
 def validate_ma(ma, danh_sach_may_tinh):
-    """Kiểm tra mã máy tính: không được rỗng, có định dạng hợp lệ và duy nhất."""
+    # Kiểm tra mã máy tính: không được rỗng, có định dạng hợp lệ và duy nhất.
     ma = ma.strip()
     if not ma:
         raise ValueError("Mã máy tính không được để trống.")
@@ -16,22 +16,35 @@ def validate_ma(ma, danh_sach_may_tinh):
     return ma
 
 def validate_tinh_trang(tinh_trang):
-    """Kiểm tra tình trạng máy tính: phải là một trong các giá trị hợp lệ."""
+    # Kiểm tra tình trạng máy tính: phải là một trong các giá trị hợp lệ.
     tinh_trang_hop_le = ['trong', 'dang_su_dung', 'bao_tri']
     tinh_trang = tinh_trang.strip().lower()
     if tinh_trang not in tinh_trang_hop_le:
         raise ValueError(f"Tình trạng máy tính không hợp lệ. Chỉ chấp nhận: {', '.join(tinh_trang_hop_le)}.")
     return tinh_trang
 
-def validate_vi_tri(vi_tri):
-    """Kiểm tra vị trí: phải có định dạng hợp lệ."""
+def validate_vi_tri(vi_tri, danh_sach_may_tinh, ma_may_hien_tai=None):
+    """
+    Kiểm tra vị trí:
+    - Phải có định dạng hợp lệ.
+    - Không được trùng lặp với các vị trí đã tồn tại.
+    - Nếu ma_may_hien_tai được cung cấp (trong trường hợp cập nhật), bỏ qua kiểm tra trùng lặp với máy tính hiện tại.
+    """
     vi_tri = vi_tri.strip()
-    if not re.match(r"^[A-Za-z]\d{2}$", vi_tri):
-        raise ValueError("Vị trí phải có định dạng 'Xxx', với 'X' là một chữ cái và 'xx' là hai chữ số.")
+    if not re.match(r"^[A-Za-z]\d{3}$", vi_tri):
+        raise ValueError("Vị trí phải có định dạng 'Xxxx', với 'X' là một chữ cái và 'xxx' là ba chữ số.")
+
+    # Kiểm tra trùng lặp vị trí
+    for may in danh_sach_may_tinh:
+        if may.vi_tri == vi_tri:
+            if ma_may_hien_tai and may.ma == ma_may_hien_tai:
+                continue  # Bỏ qua máy tính hiện tại khi cập nhật
+            else:
+                raise ValueError(f"Vị trí '{vi_tri}' đã được sử dụng cho máy tính có mã '{may.ma}'. Vui lòng chọn vị trí khác.")
     return vi_tri
 
 def validate_gia(gia):
-    """Kiểm tra giá trị giá: phải là một số dương và trong khoảng hợp lệ."""
+    # Kiểm tra giá trị giá: phải là một số dương và trong khoảng hợp lệ.
     try:
         gia_value = Decimal(gia)
         if gia_value <= 0:
@@ -43,7 +56,7 @@ def validate_gia(gia):
     return gia_value
 
 def validate_cau_hinh(cau_hinh):
-    """Kiểm tra cấu hình máy tính: không được rỗng."""
+    # Kiểm tra cấu hình máy tính: không được rỗng.
     if not cau_hinh.strip():
         raise ValueError("Cấu hình máy tính không được để trống.")
     return cau_hinh.strip()
