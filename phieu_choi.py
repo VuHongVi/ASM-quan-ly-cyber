@@ -2,6 +2,7 @@ import json
 from datetime import datetime, timedelta
 from collections import Counter
 import re
+import dich_vu
 
 class PhieuChoi:
     def __init__(self, ma_phieu, khach_hang, may_tinh, gio_bat_dau, gio_ket_thuc, dich_vu):
@@ -45,7 +46,8 @@ def menu():
         print("| 8. Tìm kiếm phiếu chơi theo thời gian")
         print("| 9. Tính thời gian chơi")
         print("| 10. Thống kê sử dụng dịch vụ theo giờ cao điểm")
-        print("| 11. THOÁT CHƯƠNG TRÌNH")
+        print("| 11. Hiển thị danh sách dịch vụ")
+        print("| 0. THOÁT CHƯƠNG TRÌNH")
         print("+--------------------+")
 
         try:
@@ -72,13 +74,15 @@ def menu():
             elif lua_chon == '10':
                 thong_ke_gio_cao_diem()
             elif lua_chon == '11':
+                dich_vu.hien_thi_danh_sach()
+            elif lua_chon == '0':
                 if xac_nhan("Bạn có chắc chắn muốn thoát chương trình?"):
                     print("Đã thoát chương trình...")
                     break
                 else:
                     print("Hủy thao tác thoát.")
             else:
-                print("Lựa chọn không hợp lệ. Vui lòng nhập số từ 1-11!")
+                print("Lựa chọn không hợp lệ. Vui lòng nhập số từ 0-11!")
         except Exception as e:
             print(f"Đã xảy ra lỗi: {e}. Vui lòng thử lại.")
 
@@ -127,51 +131,62 @@ def tim_kiem():
 
 def them_moi():
     try:
-        ma_phieu = int(input("Nhập mã phiếu: ").strip())
-        
-        # Kiểm tra mã phiếu không được trùng
-        if any(p['ma_phieu'] == ma_phieu for p in phieu_choi):
-            print("Mã phiếu đã tồn tại. Vui lòng nhập mã khác.")
-            return
-        
+        while True:
+            try:
+                ma_phieu = int(input("Nhập mã phiếu: ").strip())
+                if any(p['ma_phieu'] == ma_phieu for p in phieu_choi):
+                    print("Mã phiếu đã tồn tại. Vui lòng nhập mã khác.")
+                else:
+                    break
+            except ValueError:
+                print("Lỗi: Vui lòng nhập mã phiếu là số nguyên.")
+
         khach_hang = input("Nhập tên khách hàng: ").strip()
 
         # Nhập số máy
-        may_tinh = input("Nhập số máy: ").strip()
-        if not may_tinh.isdigit() or int(may_tinh) <= 0:
-            print("Số máy không hợp lệ. Vui lòng nhập số nguyên dương.")
-            return
+        while True:
+            may_tinh = input("Nhập số máy: ").strip()
+            if not may_tinh.isdigit() or int(may_tinh) <= 0:
+                print("Số máy không hợp lệ. Vui lòng nhập số nguyên dương.")
+            else:
+                may_tinh = int(may_tinh)
+                break
 
         # Kiểm tra định dạng ngày tháng với regex
         regex = r"^\d{4}-\d{1,2}-\d{1,2} \d{1,2}:\d{1,2}$"
 
         # Nhập giờ bắt đầu
-        gio_bat_dau = input("Nhập giờ bắt đầu (yyyy-mm-dd HH:MM): ").strip()
-        if not re.match(regex, gio_bat_dau):
-            print("Giờ bắt đầu không đúng định dạng. Vui lòng nhập lại.")
-            return
+        while True:
+            gio_bat_dau = input("Nhập giờ bắt đầu (yyyy-mm-dd HH:MM): ").strip()
+            if not re.match(regex, gio_bat_dau):
+                print("Giờ bắt đầu không đúng định dạng. Vui lòng nhập lại.")
+            else:
+                try:
+                    gio_bat_dau_dt = datetime.strptime(gio_bat_dau, "%Y-%m-%d %H:%M")
+                    break
+                except ValueError:
+                    print("Định dạng thời gian không hợp lệ. Vui lòng nhập lại.")
 
         # Nhập giờ kết thúc
-        gio_ket_thuc = input("Nhập giờ kết thúc (yyyy-mm-dd HH:MM): ").strip()
-        if not re.match(regex, gio_ket_thuc):
-            print("Giờ kết thúc không đúng định dạng. Vui lòng nhập lại.")
-            return
+        while True:
+            gio_ket_thuc = input("Nhập giờ kết thúc (yyyy-mm-dd HH:MM): ").strip()
+            if not re.match(regex, gio_ket_thuc):
+                print("Giờ kết thúc không đúng định dạng. Vui lòng nhập lại.")
+            else:
+                try:
+                    gio_ket_thuc_dt = datetime.strptime(gio_ket_thuc, "%Y-%m-%d %H:%M")
+                    break
+                except ValueError:
+                    print("Định dạng thời gian không hợp lệ. Vui lòng nhập lại.")
         
-        # Chuyển đổi giờ bắt đầu và giờ kết thúc sang datetime để kiểm tra logic thời gian
-        try:
-            gio_bat_dau_dt = datetime.strptime(gio_bat_dau, "%Y-%m-%d %H:%M")
-            gio_ket_thuc_dt = datetime.strptime(gio_ket_thuc, "%Y-%m-%d %H:%M")
-        except ValueError:
-            print("Định dạng thời gian không hợp lệ.")
-            return
-        
+        # Kiểm tra logic thời gian
         if gio_bat_dau_dt >= gio_ket_thuc_dt:
             print("Giờ bắt đầu phải nhỏ hơn giờ kết thúc.")
             return
 
         # Kiểm tra số máy không được trùng thời gian với các phiếu khác
         for phieu in phieu_choi:
-            if phieu['may_tinh'] == int(may_tinh):
+            if phieu['may_tinh'] == may_tinh:
                 phieu_gio_bat_dau_dt = datetime.strptime(phieu['gio_bat_dau'], "%Y-%m-%d %H:%M")
                 phieu_gio_ket_thuc_dt = datetime.strptime(phieu['gio_ket_thuc'], "%Y-%m-%d %H:%M")
 
@@ -185,7 +200,7 @@ def them_moi():
         phieu_moi = {
             'ma_phieu': ma_phieu,
             'khach_hang': khach_hang,
-            'may_tinh': int(may_tinh),
+            'may_tinh': may_tinh,
             'gio_bat_dau': gio_bat_dau,
             'gio_ket_thuc': gio_ket_thuc,
             'dich_vu': dich_vu
@@ -196,15 +211,18 @@ def them_moi():
         luu_du_lieu_vao_file()
         print("Đã thêm phiếu chơi thành công!")
 
-    except ValueError:
-        print("Lỗi: Vui lòng nhập mã phiếu và số máy là số nguyên.")
     except Exception as e:
         print(f"Đã xảy ra lỗi: {e}. Vui lòng thử lại.")
 
 
 def cap_nhat():
     try:
-        ma_phieu = int(input("Nhập mã phiếu cần cập nhật: ").strip())
+        while True:
+            try:
+                ma_phieu = int(input("Nhập mã phiếu cần cập nhật: ").strip())
+                break
+            except ValueError:
+                print("Lỗi: Vui lòng nhập mã phiếu là số nguyên.")
 
         # Tìm phiếu chơi theo mã
         phieu = next((p for p in phieu_choi if p['ma_phieu'] == ma_phieu), None)
@@ -221,80 +239,98 @@ def cap_nhat():
         print(f"Dịch vụ: {phieu['dich_vu']}")
 
         # Nhập mã phiếu mới
-        ma_phieu_moi = input("Nhập mã phiếu mới: ").strip()
-        if ma_phieu_moi:
-            ma_phieu_moi = int(ma_phieu_moi)
-            # Kiểm tra mã phiếu mới có bị trùng hay không
-            if any(p['ma_phieu'] == ma_phieu_moi and p['ma_phieu'] != ma_phieu for p in phieu_choi):
-                print("Mã phiếu đã tồn tại. Vui lòng nhập mã khác.")
-                return
-        else:
-            ma_phieu_moi = ma_phieu  # Giữ nguyên mã phiếu hiện tại nếu không nhập mới
+        while True:
+            ma_phieu_moi = input("Nhập mã phiếu mới (nhấn Enter để bỏ qua): ").strip()
+            if ma_phieu_moi:
+                try:
+                    ma_phieu_moi = int(ma_phieu_moi)
+                    # Kiểm tra mã phiếu mới có bị trùng hay không
+                    if any(p['ma_phieu'] == ma_phieu_moi and p['ma_phieu'] != ma_phieu for p in phieu_choi):
+                        print("Mã phiếu đã tồn tại. Vui lòng nhập mã khác.")
+                    else:
+                        break
+                except ValueError:
+                    print("Lỗi: Vui lòng nhập mã phiếu là số nguyên.")
+            else:
+                ma_phieu_moi = ma_phieu
+                break
 
         # Nhập các thông tin khác và kiểm tra hợp lệ
-        khach_hang = input("Nhập tên khách hàng mới: ").strip()
-        may_tinh = input("Nhập số máy mới: ").strip()
-        if may_tinh and (not may_tinh.isdigit() or int(may_tinh) <= 0):
-            print("Số máy không hợp lệ. Vui lòng nhập số nguyên dương.")
-            return
+        khach_hang = input("Nhập tên khách hàng mới (nhấn Enter để bỏ qua): ").strip()
+
+        while True:
+            may_tinh = input("Nhập số máy mới (nhấn Enter để bỏ qua): ").strip()
+            if may_tinh:
+                if not may_tinh.isdigit() or int(may_tinh) <= 0:
+                    print("Số máy không hợp lệ. Vui lòng nhập số nguyên dương.")
+                else:
+                    may_tinh = int(may_tinh)
+                    break
+            else:
+                may_tinh = phieu['may_tinh']
+                break
 
         # Kiểm tra định dạng ngày tháng với regex
         regex = r"^\d{4}-\d{1,2}-\d{1,2} \d{1,2}:\d{1,2}$"
 
         # Nhập giờ bắt đầu mới
-        gio_bat_dau = input("Nhập giờ bắt đầu mới (yyyy-mm-dd HH:MM): ").strip()
-        if gio_bat_dau and not re.match(regex, gio_bat_dau):
-            print("Giờ bắt đầu không đúng định dạng. Vui lòng nhập lại.")
-            return
+        while True:
+            gio_bat_dau = input("Nhập giờ bắt đầu mới (yyyy-mm-dd HH:MM) (nhấn Enter để bỏ qua): ").strip()
+            if gio_bat_dau:
+                if not re.match(regex, gio_bat_dau):
+                    print("Giờ bắt đầu không đúng định dạng. Vui lòng nhập lại.")
+                else:
+                    try:
+                        gio_bat_dau_dt = datetime.strptime(gio_bat_dau, "%Y-%m-%d %H:%M")
+                        break
+                    except ValueError:
+                        print("Định dạng thời gian không hợp lệ. Vui lòng nhập lại.")
+            else:
+                gio_bat_dau = phieu['gio_bat_dau']
+                gio_bat_dau_dt = datetime.strptime(gio_bat_dau, "%Y-%m-%d %H:%M")
+                break
 
         # Nhập giờ kết thúc mới
-        gio_ket_thuc = input("Nhập giờ kết thúc mới (yyyy-mm-dd HH:MM): ").strip()
-        if gio_ket_thuc and not re.match(regex, gio_ket_thuc):
-            print("Giờ kết thúc không đúng định dạng. Vui lòng nhập lại.")
-            return
-
-        # Chuyển đổi giờ bắt đầu và giờ kết thúc sang datetime để kiểm tra logic thời gian
-        if gio_bat_dau:
-            try:
-                gio_bat_dau_dt = datetime.strptime(gio_bat_dau, "%Y-%m-%d %H:%M")
-            except ValueError:
-                print("Giờ bắt đầu không hợp lệ.")
-                return
-
-        if gio_ket_thuc:
-            try:
+        while True:
+            gio_ket_thuc = input("Nhập giờ kết thúc mới (yyyy-mm-dd HH:MM) (nhấn Enter để bỏ qua): ").strip()
+            if gio_ket_thuc:
+                if not re.match(regex, gio_ket_thuc):
+                    print("Giờ kết thúc không đúng định dạng. Vui lòng nhập lại.")
+                else:
+                    try:
+                        gio_ket_thuc_dt = datetime.strptime(gio_ket_thuc, "%Y-%m-%d %H:%M")
+                        break
+                    except ValueError:
+                        print("Định dạng thời gian không hợp lệ. Vui lòng nhập lại.")
+            else:
+                gio_ket_thuc = phieu['gio_ket_thuc']
                 gio_ket_thuc_dt = datetime.strptime(gio_ket_thuc, "%Y-%m-%d %H:%M")
-            except ValueError:
-                print("Giờ kết thúc không hợp lệ.")
-                return
+                break
 
-        if gio_bat_dau and gio_ket_thuc and gio_bat_dau_dt >= gio_ket_thuc_dt:
+        # Kiểm tra logic thời gian
+        if gio_bat_dau_dt >= gio_ket_thuc_dt:
             print("Giờ bắt đầu phải nhỏ hơn giờ kết thúc.")
             return
 
         # Kiểm tra trùng thời gian cho số máy (nếu có thay đổi máy)
-        if may_tinh:
-            for p in phieu_choi:
-                if p['may_tinh'] == int(may_tinh) and p['ma_phieu'] != ma_phieu:
-                    phieu_gio_bat_dau_dt = datetime.strptime(p['gio_bat_dau'], "%Y-%m-%d %H:%M")
-                    phieu_gio_ket_thuc_dt = datetime.strptime(p['gio_ket_thuc'], "%Y-%m-%d %H:%M")
+        for p in phieu_choi:
+            if p['may_tinh'] == may_tinh and p['ma_phieu'] != ma_phieu:
+                phieu_gio_bat_dau_dt = datetime.strptime(p['gio_bat_dau'], "%Y-%m-%d %H:%M")
+                phieu_gio_ket_thuc_dt = datetime.strptime(p['gio_ket_thuc'], "%Y-%m-%d %H:%M")
 
-                    if (gio_bat_dau_dt < phieu_gio_ket_thuc_dt and gio_ket_thuc_dt > phieu_gio_bat_dau_dt):
-                        print("Số máy này đã được sử dụng trong khoảng thời gian đã nhập. Vui lòng chọn thời gian khác.")
-                        return
+                if (gio_bat_dau_dt < phieu_gio_ket_thuc_dt and gio_ket_thuc_dt > phieu_gio_bat_dau_dt):
+                    print("Số máy này đã được sử dụng trong khoảng thời gian đã nhập. Vui lòng chọn thời gian khác.")
+                    return
 
-        dich_vu = input("Nhập dịch vụ mới: ").strip()
+        dich_vu = input("Nhập dịch vụ mới (nhấn Enter để bỏ qua): ").strip()
 
         # Cập nhật các thuộc tính nếu có thay đổi
         phieu['ma_phieu'] = ma_phieu_moi  # Cập nhật mã phiếu mới nếu có
         if khach_hang:
             phieu['khach_hang'] = khach_hang
-        if may_tinh:
-            phieu['may_tinh'] = int(may_tinh)  # Chuyển đổi sang số nguyên
-        if gio_bat_dau:
-            phieu['gio_bat_dau'] = gio_bat_dau
-        if gio_ket_thuc:
-            phieu['gio_ket_thuc'] = gio_ket_thuc
+        phieu['may_tinh'] = may_tinh  # Cập nhật số máy
+        phieu['gio_bat_dau'] = gio_bat_dau
+        phieu['gio_ket_thuc'] = gio_ket_thuc
         if dich_vu:
             phieu['dich_vu'] = dich_vu
 
@@ -302,15 +338,18 @@ def cap_nhat():
         luu_du_lieu_vao_file()
         print("Đã cập nhật phiếu chơi thành công!")
 
-    except ValueError:
-        print("Lỗi: Vui lòng nhập mã phiếu là số nguyên.")
     except Exception as e:
         print(f"Đã xảy ra lỗi: {e}. Vui lòng thử lại.")
 
 # Xóa phiếu chơi theo mã
 def xoa():
     try:
-        ma_phieu = int(input("Nhập mã phiếu cần xóa: ").strip())
+        while True:
+            try:
+                ma_phieu = int(input("Nhập mã phiếu cần xóa: ").strip())
+                break
+            except ValueError:
+                print("Lỗi: Vui lòng nhập mã phiếu là số nguyên.")
         
         # Tìm phiếu chơi theo mã
         phieu = next((p for p in phieu_choi if p['ma_phieu'] == ma_phieu), None)
@@ -320,16 +359,13 @@ def xoa():
             return
         
         # Xác nhận trước khi xóa
-        confirm = input(f"Bạn có chắc chắn muốn xóa phiếu chơi với mã {ma_phieu}? (y/n): ").strip().lower()
-        if confirm == 'y':
+        if xac_nhan(f"Bạn có chắc chắn muốn xóa phiếu chơi với mã {ma_phieu}?"):
             phieu_choi.remove(phieu)  # Xóa phiếu chơi khỏi danh sách
             luu_du_lieu_vao_file()  # Cập nhật lại dữ liệu vào file
             print("Đã xóa phiếu chơi thành công!")
         else:
             print("Hủy thao tác xóa.")
     
-    except ValueError:
-        print("Lỗi: Vui lòng nhập mã phiếu là số nguyên.")
     except Exception as e:
         print(f"Đã xảy ra lỗi: {e}. Vui lòng thử lại.")
 
@@ -367,16 +403,21 @@ def tong_hop_dich_vu():
 
 def tim_phieu_theo_thoi_gian():
     # Nhập khoảng thời gian
-    gio_bat_dau = input("Nhập thời gian bắt đầu (định dạng: yyyy-mm-dd HH:MM): ").strip()
-    gio_ket_thuc = input("Nhập thời gian kết thúc (định dạng: yyyy-mm-dd HH:MM): ").strip()
+    while True:
+        gio_bat_dau = input("Nhập thời gian bắt đầu (định dạng: yyyy-mm-dd HH:MM): ").strip()
+        try:
+            gio_bat_dau_dt = datetime.strptime(gio_bat_dau, '%Y-%m-%d %H:%M')
+            break
+        except ValueError:
+            print("Định dạng thời gian không hợp lệ. Vui lòng nhập lại.")
 
-    try:
-        # Chuyển đổi thành đối tượng datetime
-        gio_bat_dau = datetime.strptime(gio_bat_dau, '%Y-%m-%d %H:%M')
-        gio_ket_thuc = datetime.strptime(gio_ket_thuc, '%Y-%m-%d %H:%M')
-    except ValueError:
-        print("Định dạng thời gian không hợp lệ. Vui lòng nhập lại.")
-        return
+    while True:
+        gio_ket_thuc = input("Nhập thời gian kết thúc (định dạng: yyyy-mm-dd HH:MM): ").strip()
+        try:
+            gio_ket_thuc_dt = datetime.strptime(gio_ket_thuc, '%Y-%m-%d %H:%M')
+            break
+        except ValueError:
+            print("Định dạng thời gian không hợp lệ. Vui lòng nhập lại.")
 
     # Lọc phiếu chơi theo thời gian
     print("|         TÌM KIẾM PHIẾU CHƠI THEO THỜI GIAN      |")
@@ -388,7 +429,7 @@ def tim_phieu_theo_thoi_gian():
             phieu_gio_ket_thuc = datetime.strptime(phieu['gio_ket_thuc'], '%Y-%m-%d %H:%M')
 
             # Kiểm tra xem phiếu chơi có trong khoảng thời gian yêu cầu không
-            if gio_bat_dau <= phieu_gio_bat_dau <= gio_ket_thuc or gio_bat_dau <= phieu_gio_ket_thuc <= gio_ket_thuc:
+            if gio_bat_dau_dt <= phieu_gio_bat_dau <= gio_ket_thuc_dt or gio_bat_dau_dt <= phieu_gio_ket_thuc <= gio_ket_thuc_dt:
                 print(f"Phiếu: {phieu['ma_phieu']} - Khách hàng: {phieu['khach_hang']} - Giờ bắt đầu: {phieu['gio_bat_dau']} - Giờ kết thúc: {phieu['gio_ket_thuc']}")
                 found = True
         except ValueError:
@@ -406,7 +447,12 @@ def tinh_thoi_gian_choi():
         print("Danh sách phiếu chơi trống.")
         return
     
-    ma_phieu = int(input("Nhập mã phiếu cần tính thời gian chơi: ").strip())
+    while True:
+        try:
+            ma_phieu = int(input("Nhập mã phiếu cần tính thời gian chơi: ").strip())
+            break
+        except ValueError:
+            print("Lỗi: Vui lòng nhập mã phiếu là số nguyên.")
     
     # Tìm phiếu chơi theo mã
     phieu = next((p for p in phieu_choi if p['ma_phieu'] == ma_phieu), None)
@@ -434,7 +480,7 @@ def thong_ke_gio_cao_diem():
     for gio, so_lan in thong_ke.items():
         print(f"Giờ {gio}: {so_lan} lần")
 
-def xac_nhan( message):
+def xac_nhan(message):
     while True:
         try:
             xac_nhan = input(f"{message} (Y/N): ").strip().lower()

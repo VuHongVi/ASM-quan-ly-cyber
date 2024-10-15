@@ -4,6 +4,7 @@ import json
 # import validate
 from . import validate
 import dich_vu
+import phieu_choi
 
 # Lớp Máy Tính đại diện cho máy tính trong quán game
 class MayTinh:
@@ -284,7 +285,7 @@ def menu():
         print("| 8. Sắp xếp máy tính theo cấu hình")
         print("| 9. Hiển thị các máy còn trống")
         print("| 10. Tính tổng giá trị tất cả máy tính")
-        print("| 11. Hiển thị danh sách dịch vụ")
+        print("| 11. Hiển thị danh sách phiếu chơi")
         print("| 12. THOÁT CHƯƠNG TRÌNH")
         print("+--------------------+")
 
@@ -319,7 +320,7 @@ def menu():
             elif lua_chon == 10:
                 quan_ly.tinh_tong_gia_tri()
             elif lua_chon == 11:
-                dich_vu.hien_thi_danh_sach()
+                phieu_choi.hien_thi_danh_sach()
             elif lua_chon == 12:
                 if validate.xac_nhan("Bạn có chắc chắn muốn thoát chương trình?"):
                     print("Đã thoát chương trình...")
