@@ -3,6 +3,7 @@ import os
 import json
 # import validate
 from . import validate
+import dich_vu
 
 # Lớp Máy Tính đại diện cho máy tính trong quán game
 class MayTinh:
@@ -283,18 +284,19 @@ def menu():
         print("| 8. Sắp xếp máy tính theo cấu hình")
         print("| 9. Hiển thị các máy còn trống")
         print("| 10. Tính tổng giá trị tất cả máy tính")
-        print("| 11. THOÁT CHƯƠNG TRÌNH")
+        print("| 11. Hiển thị danh sách dịch vụ")
+        print("| 12. THOÁT CHƯƠNG TRÌNH")
         print("+--------------------+")
 
         try:
-            lua_chon = input("Nhập lựa chọn của bạn (từ 1 đến 11): ").strip()
+            lua_chon = input("Nhập lựa chọn của bạn (từ 1 đến 12): ").strip()
             try:
                 lua_chon = Decimal(lua_chon)
             except InvalidOperation:
-                raise ValueError("Lựa chọn không hợp lệ. Vui lòng nhập số từ 1 đến 11!")
+                raise ValueError("Lựa chọn không hợp lệ. Vui lòng nhập số từ 1 đến 12!")
 
-            if lua_chon % 1 != 0 or not (1 <= int(lua_chon) <= 11):
-                raise ValueError("Lựa chọn phải là số nguyên từ 1 đến 11.")
+            if lua_chon % 1 != 0 or not (1 <= int(lua_chon) <= 12):
+                raise ValueError("Lựa chọn phải là số nguyên từ 1 đến 12.")
 
             if lua_chon == 1:
                 quan_ly.hien_thi_danh_sach()
@@ -317,6 +319,8 @@ def menu():
             elif lua_chon == 10:
                 quan_ly.tinh_tong_gia_tri()
             elif lua_chon == 11:
+                dich_vu.hien_thi_danh_sach()
+            elif lua_chon == 12:
                 if validate.xac_nhan("Bạn có chắc chắn muốn thoát chương trình?"):
                     print("Đã thoát chương trình...")
                     break
